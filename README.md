@@ -27,6 +27,7 @@ After training and optimizing the ANN model, I achieved an **accuracy of 86% on 
 
 Your repository comprises the following files and directories:
 
+```
 ANN-Classification-Churn/
 ├── Churn_Modelling.csv
 ├── LICENSE
@@ -40,8 +41,7 @@ ANN-Classification-Churn/
 ├── predictions.ipynb
 ├── requirements.txt
 └── scaler.pickle
-
-
+```
 
 ### Key Components
 
@@ -90,4 +90,64 @@ if st.button("Predict"):
     prediction = model.predict(np.array([[credit_score, age]]))
     result = "Churn" if prediction > 0.5 else "No Churn"
     st.write(f'Prediction: {result}')
+```
+
+---
+
+### `hyperparametertunning.ipynb`
+
+This notebook focuses on optimizing the ANN model’s hyperparameters. It covers:
+
+- **Hyperparameter Selection**: Identifying key hyperparameters such as the number of neurons, learning rate, and batch size.
+- **Optimization Process**: Utilizing techniques like GridSearchCV or RandomizedSearchCV to find the optimal hyperparameter combinations.
+- **Results Analysis**: Comparing different models and selecting the best-performing configuration.
+
+#### **Key Code Snippet**
+
+```python
+from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
+from sklearn.model_selection import RandomizedSearchCV
+
+def build_model(optimizer='adam', activation='relu'):
+    model = tf.keras.Sequential([
+        tf.keras.layers.Dense(16, activation=activation, input_shape=(11,)),
+        tf.keras.layers.Dense(8, activation=activation),
+        tf.keras.layers.Dense(1, activation='sigmoid')
+    ])
+    model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
+    return model
+
+model = KerasClassifier(build_fn=build_model, verbose=0)
+
+param_grid = {
+    'optimizer': ['adam', 'rmsprop'],
+    'activation': ['relu', 'tanh'],
+    'batch_size': [16, 32, 64],
+    'epochs': [10, 20, 30]
+}
+
+grid_search = RandomizedSearchCV(estimator=model, param_distributions=param_grid, n_iter=5, cv=3, n_jobs=-1)
+grid_search.fit(X_train, y_train)
+
+print(f'Best Parameters: {grid_search.best_params_}')
+print(f'Best Accuracy: {grid_search.best_score_}')
+```
+
+For more details, please go through the `hyperparametertunning.ipynb` file.
+
+---
+
+## Conclusion
+
+This project demonstrates the power of deep learning in predicting customer churn. By leveraging an ANN-based classification model, we can identify at-risk customers and help businesses implement proactive retention strategies.
+
+The project includes:
+- **Hyperparameter tuning**
+- **Exploratory Data Analysis (EDA)**
+- **A Streamlit web application for model deployment**
+
+This makes it a comprehensive approach to churn prediction.
+
+If you have any questions or suggestions for improvement, feel free to reach out. 🚀
+
 
